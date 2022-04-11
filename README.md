@@ -32,9 +32,7 @@ ElasticSearch.
 c. Set up a PUT event trigger4 on the photos S3 bucket (B2), such that
 whenever a photo gets uploaded to the bucket, it triggers the Lambda
 function (LF1) to index it.
-i. To test this functionality, upload a file to the photos S3 bucket (B2)
-and check the logs of the indexing Lambda function (LF1) to see if
-it got invoked. If it did, your setup is complete.
+i. To test this functionality, upload a file to the photos S3 bucket (B2) and check the logs of the indexing Lambda function (LF1) to see if it got invoked. If it did, your setup is complete.
 ● If the Lambda (LF1) did not get invoked, check to see if you set up the correct permissions5 for S3 to invoke your Lambda function.
 d. Implement the indexing Lambda function (LF1):
 i. Given a S3 PUT event (E1) detect labels in the image, using Rekognition6 (“detectLabels” method).
