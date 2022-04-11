@@ -1,22 +1,27 @@
 ﻿# Smart-Photo-Album
 This is a serverless photo album web application, that can be searched using natural language through both text and voice. The architecture diagram is as follow:
 B1 is a S3 bucket stores front-end stuff, together with API Gateway, LF2 (Lambda Function 2) forming a website that can handle user request (upload photo, search photo by text, search photo by voice, etc.)
+
 A new photo is uploaded to another S3 bucket B2, which that trigger LF1 to parse the photo using AWS Rekognition that returns some keywords of the photo. Then LF1 stores the keywords with storage information of the photo in the ElasticSearch for furture indexing.
 When user types in a sentence like "show me my cats", it is handled by LF2, which further utilize Lex to parse the sentence and get the keyword ('cats' in this case), then return the corresponding photos that contains that keyword.
-Usage
+
+## Usage
 A cloudformation template yaml file is in the root directory, which automatically builds up all the necessary Amazon Web Services, including two pipelines that help automatic code update from github and continuous delivery.
 
-LFPipeline: Build two lambda functions and the S3 storing photos (there's a trigger so I put them together for convenience). Plus, api gateway is also built here.
+## LFPipeline: 
+Build two lambda functions and the S3 storing photos (there's a trigger so I put them together for convenience). Plus, api gateway is also built here.
 PipelineS3: This is for the front-end code. Note that the front-end code is in the front-end branch
-Elastic Search
+
+## Elastic Search
 Note that there's no template for Lex so it should be built manually.
 
-1. Launch an ElasticSearch instance1
+## 1. Launch an ElasticSearch instance1
 a. Using AWS ElasticSearch service2, create a new domain called “photos”.
 b. Make note of the Security Group (SG1) you attach to the domain.
 c. Deploy the service inside a VPC3.
 i. This prevents unauthorized internet access to your service.
-2. Upload & index photos
+
+## 2. Upload & index photos
 a. Create a S3 bucket (B2) to store the photos.
 b. Create a Lambda function (LF1) called “index-photos”.
 i. Launch the Lambda function inside the same VPC as
@@ -43,7 +48,8 @@ Use the following schema for the JSON object:
 “labels”: [ “person”, “dog”, “ball”, “park”
 ]
 }
-3. Search
+
+## 3. Search
 a. Create a Lambda function (LF2) called “search-photos”.
 i. Launch the Lambda function inside the same VPC as ElasticSearch. This ensures that the function can reach the ElasticSearch instance.
 ii. Make sure the Lambda has the same Security Group (SG1) as ElasticSearch.
@@ -59,7 +65,8 @@ ii. If the Lex disambiguation request yields any keywords (K, …, K),
 search the “photos” ElasticSearch index for results, and return them accordingly (as per the API spec).
 ● You should look for ElasticSearch SDK libraries to perform the search.
 iii. Otherwise, return an empty array of results (as per the API spec).
-4. Build the API layer
+
+## 4. Build the API layer
 a. Build an API using API Gateway.
 b. The API should have two methods:
 i. PUT /photos
@@ -70,8 +77,8 @@ Connect this method to the search Lambda function (LF2).
 c. Setup an API key for your two API methods.
 d. Deploy the API.
 e. Generate a SDK for the API (SDK1).
-8
-5. Frontend
+
+## 5. Frontend
 a. Build a simple frontend application that allows users to:
 i. Make search requests to the GET /search endpoint
 ii. Display the results (photos) resulting from the query
@@ -82,13 +89,14 @@ b. Create a S3 bucket for your frontend (B1).
 c. Set up the bucket for static website hosting (same as HW1).
 d. Upload the frontend files to the bucket (B2).
 e. Integrate the API Gateway-generated SDK (SDK1) into the frontend, to connect your API.
-6. Implement Voice accessibility in the frontend
+
+## 6. Implement Voice accessibility in the frontend
 a. Give the frontend user the choice to use voice rather than text to perform the search.
 b. Use Amazon Transcribe10 on the frontend to transcribe speech to text (STT) in real time11, then use the transcribed text to perform the search, using the same API like in the previous steps.
 c. Note: You can use a Google-like UI (see below) for implementing the
 search: 1. input field for text searches and 2. microphone icon for voice interactions.
 
-7. Deploy your code using AWS CodePipeline12
+## 7. Deploy your code using AWS CodePipeline12
 a. Define a pipeline (P1) in AWS CodePipeline that builds and deploys the code for/to all your Lambda functions
 b. Define a pipeline (P2) in AWS CodePipeline that builds and deploys your frontend code to its corresponding S3 bucket
 8. Create a AWS CloudFormation13 template for the stack
