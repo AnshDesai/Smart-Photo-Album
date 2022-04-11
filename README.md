@@ -5,7 +5,7 @@ B1 is a S3 bucket stores front-end stuff, together with API Gateway, LF2 (Lambda
 A new photo is uploaded to another S3 bucket B2, which that trigger LF1 to parse the photo using AWS Rekognition that returns some keywords of the photo. Then LF1 stores the keywords with storage information of the photo in the ElasticSearch for furture indexing.
 When user types in a sentence like "show me my cats", it is handled by LF2, which further utilize Lex to parse the sentence and get the keyword ('cats' in this case), then return the corresponding photos that contains that keyword.
 
-![diagram](images/architecture.png)
+![diagram](architecture.png)
 
 ## Usage
 A cloudformation template yaml file is in the root directory, which automatically builds up all the necessary Amazon Web Services, including two pipelines that help automatic code update from github and continuous delivery.
